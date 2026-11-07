@@ -101,8 +101,9 @@ export function buildSeed(): AppState {
     a("a29", "p_gopal", "d_khan", d(-24), "12:00", 30, "Extraction", "completed", "c1"),
   ];
 
+  let msgSeq = 0;
   const m = (dir: "in" | "out", author: Message["author"], text: string, at: string, extra: Partial<Message> = {}): Message => ({
-    id: "m_" + Math.random().toString(36).slice(2, 9), dir, author, text, at,
+    id: `m_seed_${++msgSeq}`, dir, author, text, at,
     status: dir === "in" ? "received" : "read", category: dir === "out" ? "service" : undefined, cost: 0, ...extra,
   });
 
