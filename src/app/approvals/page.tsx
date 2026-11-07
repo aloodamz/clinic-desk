@@ -7,9 +7,9 @@ import { ago, rupees } from "@/lib/format";
 import { Avatar, KpiCard, KpiIcons } from "@/components/ui";
 
 export default function ApprovalsPage() {
-  const { state, decideWaiver, toast } = useStore();
+  const { state, user, role, decideWaiver, toast } = useStore();
 
-  if (!state) return null;
+  if (!state || !user) return null;
 
   const pending = state.waivers.filter((w) => w.status === "pending");
   const decided = state.waivers.filter((w) => w.status !== "pending");
@@ -118,41 +118,48 @@ export default function ApprovalsPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        className="btn btn-sm"
-                        onClick={() => {
-                          decideWaiver(w.id, true, "app");
-                          toast(
-                            `Approved: Fee waived ${rupees(w.amount)}, approved by ${doctorName(state, w.approverDoctorId)}.`,
-                            "ok",
-                          );
-                        }}
-                      >
-                        Approve
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-ghost btn-sm"
-                        onClick={() => {
-                          decideWaiver(w.id, true, "whatsapp");
-                          toast("Approved via WhatsApp quick-reply.", "ok");
-                        }}
-                      >
-                        Approve (WA)
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-ghost btn-sm text-[#B42318]"
-                        onClick={() => {
-                          decideWaiver(w.id, false, "app");
-                          toast("Waiver request declined.", "warn");
-                        }}
-                      >
-                        Decline
-                      </button>
-                    </div>
+                    {role === "owner" ||
+                    (role === "doctor" && user.doctorId === w.approverDoctorId) ? (
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          className="btn btn-sm"
+                          onClick={() => {
+                            decideWaiver(w.id, true, "app");
+                            toast(
+                              `Approved: Fee waived ${rupees(w.amount)}, approved by ${doctorName(state, w.approverDoctorId)}.`,
+                              "ok",
+                            );
+                          }}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-ghost btn-sm"
+                          onClick={() => {
+                            decideWaiver(w.id, true, "whatsapp");
+                            toast("Approved via WhatsApp quick-reply.", "ok");
+                          }}
+                        >
+                          Approve (WA)
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-ghost btn-sm text-[#B42318]"
+                          onClick={() => {
+                            decideWaiver(w.id, false, "app");
+                            toast("Waiver request declined.", "warn");
+                          }}
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="chip sm no-dot shrink-0">
+                        Read-only · Needs {doctorName(state, w.approverDoctorId)} or Owner
+                      </span>
+                    )}
                   </div>
                 );
               })}

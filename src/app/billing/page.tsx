@@ -19,12 +19,15 @@ const STATUS_CHIP: Record<InvoiceStatus, string> = {
 export default function BillingPage() {
   const {
     state,
+    role,
     sendPaymentLink,
     recordPayment,
     refundPayment,
     requestWaiver,
     toast,
   } = useStore();
+
+  const canMutateBilling = role === "owner" || role === "front_desk";
 
   const [selId, setSelId] = useState<string | null>(state?.invoices[0]?.id ?? null);
   const [statusFilter, setStatusFilter] = useState<"all" | "due" | "paid">("all");
@@ -280,7 +283,7 @@ export default function BillingPage() {
             </div>
 
             {/* Cashier Actions */}
-            {totals.due > 0 && (
+            {totals.due > 0 && canMutateBilling && (
               <div className="flex flex-col gap-2.5 pt-1">
                 <div className="flex items-center gap-2">
                   <select
@@ -358,7 +361,7 @@ export default function BillingPage() {
                     </div>
                     <div className="flex items-center gap-2.5">
                       <span className="font-bold tabular-nums">{rupees(py.amount)}</span>
-                      {!py.refunded && (
+                      {!py.refunded && canMutateBilling && (
                         <button
                           type="button"
                           onClick={() => {

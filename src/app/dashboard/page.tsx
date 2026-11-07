@@ -6,6 +6,7 @@ import { useStore } from "@/lib/store";
 import { invoiceTotals } from "@/lib/selectors";
 import { rupees, rupeesPaise } from "@/lib/format";
 import { RATES } from "@/lib/templates";
+import { levelFor } from "@/lib/access";
 import { Avatar, KpiCard, KpiIcons, WeeklyStackedChart } from "@/components/ui";
 
 const FUNNEL_STAGES = [
@@ -20,11 +21,15 @@ const FUNNEL_STAGES = [
 
 export default function DashboardPage() {
   const { state, user, role, toast } = useStore();
-  const [scope, setScope] = useState<"all" | "mine">(role === "doctor" ? "mine" : "all");
+  const dashAccess = levelFor("dashboard", role);
+  const isFunnelOnly = dashAccess === "funnel";
+  const isOwnOnly = dashAccess === "own";
+  const [scope, setScope] = useState<"all" | "mine">(isOwnOnly ? "mine" : "all");
 
   if (!state || !user) return null;
 
-  const filterDocId = scope === "mine" && user.doctorId ? user.doctorId : null;
+  const effectiveScope = isOwnOnly ? "mine" : scope;
+  const filterDocId = effectiveScope === "mine" && user.doctorId ? user.doctorId : null;
 
   let collected = 0;
   let due = 0;
@@ -89,7 +94,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
-          {user.doctorId && (
+          {user.doctorId && dashAccess === "full" && (
             <div className="seg-group">
               <button
                 type="button"
@@ -119,24 +124,49 @@ export default function DashboardPage() {
 
       {/* 4-Column KPI Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard
-          label="COLLECTED"
-          value={rupees(collected)}
-          sublabel={waivedTotal > 0 ? `Net after ${rupees(waivedTotal)} waived` : "Paid across all receipts"}
-          trend="+12.4%"
-          trendTone="ok"
-          icon={KpiIcons.rupee}
-          sparkline={[12, 18, 15, 22, 19, 26, 29]}
-        />
-        <KpiCard
-          label="PENDING DUES"
-          value={rupees(due)}
-          sublabel="Unpaid or part-paid invoices"
-          trend={due > 0 ? "Action needed" : "Clear"}
-          trendTone={due > 0 ? "warn" : "ok"}
-          icon={KpiIcons.note}
-          sparkline={[9, 12, 10, 8, 11, 7, 6]}
-        />
+        {isFunnelOnly ? (
+          <>
+            <KpiCard
+              label="ACTIVE NEW LEADS"
+              value={newDeals.length}
+              sublabel="In new-patient conversion funnel"
+              trend="Funnel view"
+              trendTone="info"
+              icon={KpiIcons.users}
+              sparkline={[5, 8, 7, 10, 9, 12, Math.max(4, newDeals.length)]}
+            />
+            <KpiCard
+              label="OPEN NEXT STEPS"
+              value={openSteps}
+              sublabel="Pending recalls & plan follow-ups"
+              trend={openSteps > 0 ? "Follow up" : "Clear"}
+              trendTone={openSteps > 0 ? "warn" : "ok"}
+              icon={KpiIcons.note}
+              sparkline={[6, 5, 7, 8, 6, 5, Math.max(2, openSteps)]}
+            />
+          </>
+        ) : (
+          <>
+            <KpiCard
+              label="COLLECTED"
+              value={rupees(collected)}
+              sublabel={waivedTotal > 0 ? `Net after ${rupees(waivedTotal)} waived` : "Paid across all receipts"}
+              trend="+12.4%"
+              trendTone="ok"
+              icon={KpiIcons.rupee}
+              sparkline={[12, 18, 15, 22, 19, 26, 29]}
+            />
+            <KpiCard
+              label="PENDING DUES"
+              value={rupees(due)}
+              sublabel="Unpaid or part-paid invoices"
+              trend={due > 0 ? "Action needed" : "Clear"}
+              trendTone={due > 0 ? "warn" : "ok"}
+              icon={KpiIcons.note}
+              sparkline={[9, 12, 10, 8, 11, 7, 6]}
+            />
+          </>
+        )}
         <KpiCard
           label="VISITS COMPLETED"
           value={completedVisits}
