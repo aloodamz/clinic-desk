@@ -155,23 +155,25 @@ export default function TodayPage() {
               ))}
             </select>
           )}
-          <button
-            type="button"
-            className="btn"
-            onClick={() => setBookingOpen(true)}
-          >
-            + Book Visit
-          </button>
+          {role !== "counsellor" && role !== "assistant" && (
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setBookingOpen(true)}
+            >
+              + Book Visit
+            </button>
+          )}
         </div>
       </div>
 
-      {/* 4-Column KPI Row (Pulse Clinic + Mitrasehat style) */}
+      {/* 4-Column KPI Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
           label="BOOKED"
           value={booked}
           sublabel="Not cancelled today"
-          trend="+14%"
+          trend={`${dayAppts.filter((a) => a.isNewPatient).length} new`}
           trendTone="ok"
           icon={KpiIcons.calendar}
           sparkline={[5, 6, 7, 6, 8, 7, booked || 8]}

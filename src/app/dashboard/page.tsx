@@ -74,22 +74,33 @@ export default function DashboardPage() {
   ];
 
   const openHandoffs = state.handoffs.filter((h) => h.status === "open").length;
-  const resolvedHandoffs = state.handoffs.filter((h) => h.status === "resolved").length;
+  const highPriorityHandoffs = state.handoffs.filter(
+    (h) => h.status === "open" && h.priority === "high",
+  ).length;
   const openSteps = state.nextSteps.filter((n) => n.status === "open").length;
+  const pendingWaivers = state.waivers.filter((w) => w.status === "pending").length;
+  const paidInvoicesCount = state.invoices.filter((i) =>
+    filterDocId ? i.doctorId === filterDocId && i.status === "paid" : i.status === "paid",
+  ).length;
+  const unpaidInvoicesCount = state.invoices.filter((i) =>
+    filterDocId ? i.doctorId === filterDocId && i.status !== "paid" : i.status !== "paid",
+  ).length;
 
   return (
     <div className="w-full flex flex-col gap-6">
-      {/* Top Header (Mitrasehat & Medoria style) */}
+      {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#868C98] mb-1">
-            OVERVIEW · EXECUTIVE ANALYTICS
+            OVERVIEW · {state.settings.clinicName.toUpperCase()}
           </div>
           <h1 className="text-[26px] leading-tight font-bold tracking-tight text-[#111315]">
-            Welcome back, {user.name.split(" ")[0]}
+            Dashboard
           </h1>
           <p className="text-[13.5px] text-[#667085] mt-0.5">
-            Real-time clinic revenue, patient funnel, doctor utilization, and WhatsApp spend.
+            {isFunnelOnly
+              ? "New-patient funnel, recall progress, and WhatsApp message costs."
+              : "Collections, pending bills, new-patient funnel, and doctor load."}
           </p>
         </div>
 
@@ -101,23 +112,23 @@ export default function DashboardPage() {
                 onClick={() => setScope("all")}
                 className={`seg-btn ${scope === "all" ? "active" : ""}`}
               >
-                Full Clinic
+                All doctors
               </button>
               <button
                 type="button"
                 onClick={() => setScope("mine")}
                 className={`seg-btn ${scope === "mine" ? "active" : ""}`}
               >
-                My Practice
+                My patients
               </button>
             </div>
           )}
           <button
             type="button"
             className="btn-ghost"
-            onClick={() => toast("Weekly clinic report exported to CSV.", "ok")}
+            onClick={() => toast("Exported summary CSV.", "ok")}
           >
-            ↓ Export Summary
+            ↓ Export CSV
           </button>
         </div>
       </div>
@@ -127,10 +138,10 @@ export default function DashboardPage() {
         {isFunnelOnly ? (
           <>
             <KpiCard
-              label="ACTIVE NEW LEADS"
+              label="NEW PATIENT LEADS"
               value={newDeals.length}
-              sublabel="In new-patient conversion funnel"
-              trend="Funnel view"
+              sublabel="On the new-patient board"
+              trend={`${newDeals.filter((d) => d.stage === "Booked" || d.stage === "Showed").length} booked/showed`}
               trendTone="info"
               icon={KpiIcons.users}
               sparkline={[5, 8, 7, 10, 9, 12, Math.max(4, newDeals.length)]}
@@ -138,8 +149,8 @@ export default function DashboardPage() {
             <KpiCard
               label="OPEN NEXT STEPS"
               value={openSteps}
-              sublabel="Pending recalls & plan follow-ups"
-              trend={openSteps > 0 ? "Follow up" : "Clear"}
+              sublabel="Follow-ups & recalls due"
+              trend={openSteps > 0 ? "Needs follow-up" : "Clear"}
               trendTone={openSteps > 0 ? "warn" : "ok"}
               icon={KpiIcons.note}
               sparkline={[6, 5, 7, 8, 6, 5, Math.max(2, openSteps)]}
@@ -150,8 +161,12 @@ export default function DashboardPage() {
             <KpiCard
               label="COLLECTED"
               value={rupees(collected)}
-              sublabel={waivedTotal > 0 ? `Net after ${rupees(waivedTotal)} waived` : "Paid across all receipts"}
-              trend="+12.4%"
+              sublabel={
+                waivedTotal > 0
+                  ? `After ${rupees(waivedTotal)} in approved waivers`
+                  : "Across all recorded receipts"
+              }
+              trend={`${paidInvoicesCount} paid`}
               trendTone="ok"
               icon={KpiIcons.rupee}
               sparkline={[12, 18, 15, 22, 19, 26, 29]}
@@ -159,8 +174,8 @@ export default function DashboardPage() {
             <KpiCard
               label="PENDING DUES"
               value={rupees(due)}
-              sublabel="Unpaid or part-paid invoices"
-              trend={due > 0 ? "Action needed" : "Clear"}
+              sublabel="Unpaid or part-paid bills"
+              trend={due > 0 ? `${unpaidInvoicesCount} open` : "Clear"}
               trendTone={due > 0 ? "warn" : "ok"}
               icon={KpiIcons.note}
               sparkline={[9, 12, 10, 8, 11, 7, 6]}
@@ -170,8 +185,8 @@ export default function DashboardPage() {
         <KpiCard
           label="VISITS COMPLETED"
           value={completedVisits}
-          sublabel={`Out of ${scheduledVisits} scheduled visits`}
-          trend="+10.8%"
+          sublabel={`Of ${scheduledVisits} non-cancelled visits`}
+          trend={`${scheduledVisits ? Math.round((completedVisits / scheduledVisits) * 100) : 0}% done`}
           trendTone="ok"
           icon={KpiIcons.check}
           sparkline={[4, 6, 5, 8, 7, 9, Math.max(5, completedVisits)]}
@@ -179,8 +194,8 @@ export default function DashboardPage() {
         <KpiCard
           label="WHATSAPP SPEND"
           value={rupeesPaise(waTotal)}
-          sublabel={`${waMkt} mkt · ${waUtil} util · ${waService} free`}
-          trend="24h gated"
+          sublabel={`${waMkt} marketing · ${waUtil} utility · ${waService} free`}
+          trend="Meta India tariff"
           trendTone="neutral"
           icon={KpiIcons.message}
         />
@@ -191,8 +206,8 @@ export default function DashboardPage() {
         <div className="lg:col-span-7">
           <WeeklyStackedChart
             days={weeklyDays}
-            totalLabel={`${scheduledVisits + newDeals.length} Touchpoints`}
-            deltaLabel="+10.78% vs last wk"
+            totalLabel={`${scheduledVisits} Visits`}
+            deltaLabel={`${completedVisits} completed`}
           />
         </div>
 
@@ -210,7 +225,7 @@ export default function DashboardPage() {
               </Link>
             </div>
             <p className="text-[12.5px] text-[#667085] mb-4">
-              Lead progression from first enquiry to completed treatment
+              Where first-time patients sit between enquiry and completed treatment.
             </p>
 
             <div className="flex flex-col gap-3">
@@ -254,17 +269,19 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Bottom 12-Column Row: Doctor Performance Table + Medoria Insights Box */}
+      {/* Bottom 12-Column Row: By Doctor Table + Clinic Notes */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* Left 7 Columns: Doctor Performance */}
+        {/* Left 7 Columns: By Doctor */}
         <div className="lg:col-span-7 card !p-0 overflow-hidden">
           <div className="p-5 pb-3.5 border-b border-[#E6E7EA] flex items-center justify-between">
             <div>
               <div className="text-[11px] font-bold uppercase tracking-[0.07em] text-[#525866]">
-                DOCTOR UTILIZATION &amp; CHAIR LOAD
+                BY DOCTOR &amp; SITE
               </div>
               <p className="text-[12.5px] text-[#667085] mt-0.5">
-                Completed consultations, active bookings, and billed revenue per clinician
+                {isFunnelOnly
+                  ? "Booked and completed visits per doctor"
+                  : "Booked visits, completed visits, and collected amount per doctor"}
               </p>
             </div>
             <Link href="/today" className="btn-ghost btn-sm">
@@ -279,8 +296,9 @@ export default function DashboardPage() {
                   <th>Doctor</th>
                   <th>Site</th>
                   <th>Booked</th>
-                  <th>Completed</th>
-                  <th>Load</th>
+                  <th>Done</th>
+                  {!isFunnelOnly && <th>Collected</th>}
+                  <th>Completion</th>
                 </tr>
               </thead>
               <tbody>
@@ -293,6 +311,9 @@ export default function DashboardPage() {
                     ? Math.round((docDone / docAppts.length) * 100)
                     : 0;
                   const site = state.sites.find((s) => s.id === d.siteIds[0]);
+                  const docCollected = state.invoices
+                    .filter((inv) => inv.doctorId === d.id)
+                    .reduce((s, inv) => s + invoiceTotals(inv, state.waivers).paid, 0);
 
                   return (
                     <tr key={d.id}>
@@ -315,6 +336,11 @@ export default function DashboardPage() {
                       </td>
                       <td className="tabular-nums font-semibold">{docAppts.length}</td>
                       <td className="tabular-nums text-[#067647] font-semibold">{docDone}</td>
+                      {!isFunnelOnly && (
+                        <td className="tabular-nums font-semibold text-[#111315]">
+                          {rupees(docCollected)}
+                        </td>
+                      )}
                       <td className="w-36">
                         <div className="flex items-center gap-2">
                           <div className="flex-1 h-2 bg-[#F2F3F5] rounded-full overflow-hidden">
@@ -336,14 +362,14 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Right 5 Columns: Medoria Insights Box & WhatsApp Cost Ledger */}
+        {/* Right 5 Columns: Operational Summary */}
         <div className="lg:col-span-5 flex flex-col gap-4">
           <div className="card">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[11px] font-bold uppercase tracking-[0.07em] text-[#525866]">
-                INSIGHTS BOX
+                OPEN WORK ACROSS THE DESK
               </span>
-              <span className="chip sm ok">Real-time</span>
+              <span className="chip sm no-dot">Today</span>
             </div>
 
             <div className="flex flex-col gap-2.5">
@@ -353,11 +379,11 @@ export default function DashboardPage() {
                 </span>
                 <div>
                   <div className="font-semibold text-[13px] text-[#111315]">
-                    Follow-up Recovery Opportunity
+                    {openSteps} open next steps &amp; recalls
                   </div>
                   <div className="text-[12px] text-[#667085] mt-0.5">
-                    {openSteps} patients have open next-step treatments or 6-month recalls waiting
-                    to be booked.
+                    Second sittings, crown fittings, stitch removals, and 6-month check-ups waiting
+                    for a confirmed slot.
                   </div>
                 </div>
               </div>
@@ -368,11 +394,12 @@ export default function DashboardPage() {
                 </span>
                 <div>
                   <div className="font-semibold text-[13px] text-[#111315]">
-                    H1–H10 Safety Handoff SLA
+                    {openHandoffs} open handoffs ({highPriorityHandoffs} urgent) · {pendingWaivers}{" "}
+                    pending waivers
                   </div>
                   <div className="text-[12px] text-[#667085] mt-0.5">
-                    {openHandoffs} open handoffs · {resolvedHandoffs} resolved. AI automatically
-                    pauses on clinical risk, fee waiver asks, or voice notes.
+                    Chats where the AI stepped back for pain/swelling (H1), price talk (H5), or
+                    records requests (H8).
                   </div>
                 </div>
               </div>
@@ -383,11 +410,11 @@ export default function DashboardPage() {
                 </span>
                 <div className="flex-1">
                   <div className="font-semibold text-[13px] text-[#111315]">
-                    WhatsApp Per-Message Cost Ledger
+                    WhatsApp message breakdown
                   </div>
                   <div className="text-[12px] text-[#667085] mt-0.5">
                     Utility ({rupeesPaise(RATES.utility)}): {waUtil} sent · Marketing (
-                    {rupeesPaise(RATES.marketing)}): {waMkt} sent · 24h Service (₹0):{" "}
+                    {rupeesPaise(RATES.marketing)}): {waMkt} sent · 24h free replies (₹0):{" "}
                     {waService} sent.
                   </div>
                 </div>

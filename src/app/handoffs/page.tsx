@@ -37,14 +37,13 @@ export default function HandoffsPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#868C98] mb-1">
-            CARE &amp; AI DESK · CLINICAL SAFETY GUARDRAILS
+            CARE · SAFETY HANDOFFS
           </div>
           <h1 className="text-[26px] leading-tight font-bold tracking-tight text-[#111315]">
-            Safety Handoffs (H1–H10)
+            Handoffs (H1–H10)
           </h1>
           <p className="text-[13.5px] text-[#667085] mt-0.5">
-            Conversations where AI paused or flagged a clinical/operational rule. Target SLA:{" "}
-            {slaMin} minutes.
+            Chats the AI passed to a person, with the rule that fired and a {slaMin}-minute clock.
           </p>
         </div>
 

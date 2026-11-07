@@ -19,7 +19,7 @@ const STATUS_CHIP: Record<PlanStatus, string> = {
 };
 
 export default function PlansPage() {
-  const { state, sendEstimate, setPlanItems, unlockEstimate, toast } = useStore();
+  const { state, role, sendEstimate, setPlanItems, unlockEstimate, toast } = useStore();
   const [selId, setSelId] = useState<string | null>(state?.plans[0]?.id ?? null);
   const [selectedTooth, setSelectedTooth] = useState<string>("36");
   const [newProcedure, setNewProcedure] = useState<string>("Root canal");
@@ -67,20 +67,22 @@ export default function PlansPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#868C98] mb-1">
-            CONSULTING ROOM · FDI CHART &amp; ESTIMATES
+            CONSULTING ROOM · PLANS &amp; ESTIMATES
           </div>
           <h1 className="text-[26px] leading-tight font-bold tracking-tight text-[#111315]">
-            Treatment Plans &amp; Estimates
+            Treatment Plans
           </h1>
           <p className="text-[13.5px] text-[#667085] mt-0.5">
-            Build multi-tooth treatment plans and share 4-digit OTP-protected estimate links (valid
-            14 days, locks after 5 wrong tries).
+            Treatment plans and estimates with a 4-digit code-protected link (valid 14 days, locks
+            after 5 wrong tries).
           </p>
         </div>
 
-        <button type="button" className="btn" onClick={() => setCreateOpen(true)}>
-          + New Treatment Plan
-        </button>
+        {role !== "front_desk" && (
+          <button type="button" className="btn" onClick={() => setCreateOpen(true)}>
+            + New Treatment Plan
+          </button>
+        )}
       </div>
 
       {/* Master-Detail 12-Column Split */}

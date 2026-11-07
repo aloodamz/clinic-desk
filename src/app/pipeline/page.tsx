@@ -65,10 +65,10 @@ export default function PipelinePage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#868C98] mb-1">
-            CARE &amp; AI DESK · CONVERSION KANBAN
+            CARE · PIPELINE
           </div>
           <h1 className="text-[26px] leading-tight font-bold tracking-tight text-[#111315]">
-            Patient Pipeline
+            Pipeline
           </h1>
           <p className="text-[13.5px] text-[#667085] mt-0.5">
             {BOARDS.find((b) => b.id === board)?.desc}

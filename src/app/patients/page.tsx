@@ -67,21 +67,23 @@ function PatientsContent() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#868C98] mb-1">
-            CARE &amp; AI DESK · CLINICAL RECORDS
+            CARE · PATIENT RECORDS
           </div>
           <h1 className="text-[26px] leading-tight font-bold tracking-tight text-[#111315]">
-            Patients &amp; Dossiers
+            Patients
           </h1>
           <p className="text-[13.5px] text-[#667085] mt-0.5">
             {role === "doctor"
-              ? "Showing patients assigned to you. Reassignments are logged with reason."
-              : "Complete patient directory with DPDP 2023 consent controls, treatment plans, and billing history."}
+              ? "Patients assigned to you. Doctor changes are logged with a reason."
+              : "Search patients and families. Visits, plans, bills, and messages."}
           </p>
         </div>
 
-        <button type="button" className="btn" onClick={() => setAddOpen(true)}>
-          + Add Patient
-        </button>
+        {role !== "counsellor" && (
+          <button type="button" className="btn" onClick={() => setAddOpen(true)}>
+            + Add Patient
+          </button>
+        )}
       </div>
 
       {/* Search & Filter Bar */}
