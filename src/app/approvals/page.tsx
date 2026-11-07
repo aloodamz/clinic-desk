@@ -23,14 +23,13 @@ export default function ApprovalsPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#868C98] mb-1">
-            ACCOUNT &amp; BILLING · GOVERNANCE &amp; WAIVERS
+            BILLING · FEE WAIVERS
           </div>
           <h1 className="text-[26px] leading-tight font-bold tracking-tight text-[#111315]">
-            Fee Waiver Approvals
+            Approvals
           </h1>
           <p className="text-[13.5px] text-[#667085] mt-0.5">
-            Fee waiver requests submitted by the desk. Only a named doctor or clinic owner can
-            approve or decline.
+            Fee waiver requests. Only the named doctor or the clinic owner decides.
           </p>
         </div>
 
@@ -221,38 +220,37 @@ export default function ApprovalsPage() {
           </div>
         </div>
 
-        {/* Right 4 Columns: Governance Policy Card */}
+        {/* Right 4 Columns: Fee Waiver Rules */}
         <div className="lg:col-span-4 card flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold uppercase tracking-[0.07em] text-[#525866]">
-              CLINICAL FEE WAIVER POLICY
+              HOW FEE WAIVERS WORK
             </span>
-            <span className="chip sm core">Enforced</span>
+            <span className="chip sm core">Rule</span>
           </div>
           <p className="text-[13px] text-[#525866] leading-relaxed">
-            To protect clinical value and prevent unapproved desk discounts, ClinicDesk enforces
-            three strict rules:
+            Every waiver keeps the original treatment charge visible on the bill:
           </p>
           <div className="flex flex-col gap-2.5 text-[12.5px] text-[#111315]">
             <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA]">
               <div className="font-bold">1. Never call a waiver &ldquo;Free&rdquo;</div>
               <div className="text-[#667085] mt-0.5">
-                Every invoice records the full clinical charge and a separate line reading:{" "}
+                The bill records the full charge and a separate line reading:{" "}
                 <em>&ldquo;Fee waived ₹X, approved by Dr Y&rdquo;</em>.
               </div>
             </div>
             <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA]">
-              <div className="font-bold">2. Named Clinician Sign-off</div>
+              <div className="font-bold">2. Named doctor or owner decides</div>
               <div className="text-[#667085] mt-0.5">
-                Front desk and counsellors can request a waiver, but only the treating doctor or
-                clinic owner can approve it.
+                Front desk and counsellors can request a waiver, but only the named doctor or the
+                owner can approve it.
               </div>
             </div>
             <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA]">
-              <div className="font-bold">3. H5 Price / Discount Handoff</div>
+              <div className="font-bold">3. H5 price &amp; discount handoff</div>
               <div className="text-[#667085] mt-0.5">
-                When a patient asks for a discount on WhatsApp, Rule H5 pauses the AI and routes
-                the conversation to the counsellor.
+                When a patient asks for a discount on WhatsApp, Rule H5 stops the AI and passes the
+                chat to the counsellor.
               </div>
             </div>
           </div>

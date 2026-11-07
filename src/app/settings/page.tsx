@@ -19,14 +19,13 @@ export default function SettingsPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#868C98] mb-1">
-            ACCOUNT &amp; BILLING · CLINIC CONFIGURATION
+            SETTINGS · CLINIC SETUP
           </div>
           <h1 className="text-[26px] leading-tight font-bold tracking-tight text-[#111315]">
-            Clinic Settings
+            Settings
           </h1>
           <p className="text-[13.5px] text-[#667085] mt-0.5">
-            Configure clinic identity, operating hours, doctors, chairs, partner hospital sites,
-            staff roles, and demo controls.
+            Hours, holidays, doctors, chairs, places, staff, and roles.
           </p>
         </div>
 

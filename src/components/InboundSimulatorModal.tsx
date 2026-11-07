@@ -66,10 +66,10 @@ export function InboundSimulatorModal({ open, onClose }: { open: boolean; onClos
         <div className="flex items-start justify-between gap-3 mb-4">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-[0.07em] text-[#868C98]">
-              WhatsApp &amp; Instagram Webhook Simulator
+              TEST PATIENT MESSAGE
             </div>
             <h2 className="font-bold text-[17px] text-[#111315] mt-0.5">
-              Simulate Incoming Patient Message
+              Send a Test Patient Reply
             </h2>
           </div>
           <button
@@ -84,7 +84,7 @@ export function InboundSimulatorModal({ open, onClose }: { open: boolean; onClos
         <div className="flex flex-col gap-3.5">
           <div>
             <label className="block text-[12px] font-semibold text-[#525866] mb-1.5">
-              Select Patient Thread
+              Patient chat
             </label>
             <select
               className="w-full"
@@ -119,7 +119,7 @@ export function InboundSimulatorModal({ open, onClose }: { open: boolean; onClos
 
           <div>
             <div className="text-[11.5px] font-semibold text-[#525866] mb-1.5">
-              Quick Clinical &amp; H1–H10 Test Presets
+              Sample messages (H1–H10 rules)
             </div>
             <div className="flex flex-wrap gap-1.5">
               {PRESET_SCENARIOS.map((sc) => (
@@ -137,7 +137,7 @@ export function InboundSimulatorModal({ open, onClose }: { open: boolean; onClos
 
           <div>
             <label className="block text-[12px] font-semibold text-[#525866] mb-1.5">
-              Message Payload
+              Patient message
             </label>
             <textarea
               className="w-full"

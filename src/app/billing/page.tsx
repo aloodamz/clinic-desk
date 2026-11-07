@@ -67,13 +67,13 @@ export default function BillingPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#868C98] mb-1">
-            ACCOUNT &amp; BILLING · CASHIER &amp; RECEIPTS
+            BILLING · INVOICES &amp; RECEIPTS
           </div>
           <h1 className="text-[26px] leading-tight font-bold tracking-tight text-[#111315]">
-            Billing &amp; Invoices
+            Billing
           </h1>
           <p className="text-[13.5px] text-[#667085] mt-0.5">
-            Invoices, WhatsApp payment links, receipts, refunds, and doctor-approved fee waivers.
+            Invoices, payment links, receipts, refunds, and doctor-approved fee waivers.
           </p>
         </div>
 

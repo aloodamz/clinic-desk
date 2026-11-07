@@ -19,14 +19,13 @@ export default function MapPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#868C98] mb-1">
-            ARCHITECTURE · SYSTEM SPECIFICATION
+            REFERENCE · SYSTEM MAP
           </div>
           <h1 className="text-[26px] leading-tight font-bold tracking-tight text-[#111315]">
-            ClinicDesk Architecture Map
+            ClinicDesk Map
           </h1>
           <p className="text-[13.5px] text-[#667085] mt-0.5">
-            Interactive reference of the 11 screens, 6 staff roles, H1–H10 safety handoffs, and
-            Meta India WhatsApp templates.
+            The 11 screens, 6 staff roles, H1–H10 handoff rules, and Meta India WhatsApp templates.
           </p>
         </div>
 

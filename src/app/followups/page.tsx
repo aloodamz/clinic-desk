@@ -57,14 +57,14 @@ export default function FollowUpsPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#868C98] mb-1">
-            CONSULTING ROOM · AI FOLLOW-UP LADDER
+            CONSULTING ROOM · NEXT STEPS &amp; RECALLS
           </div>
           <h1 className="text-[26px] leading-tight font-bold tracking-tight text-[#111315]">
-            Follow-ups &amp; Recalls
+            Follow-ups
           </h1>
           <p className="text-[13.5px] text-[#667085] mt-0.5">
-            Automated next-step ladder: Day -2 send 2 slots → Day 0 due reminder → Day +3 staff
-            call task → Day +14 close with reason.
+            Next steps set at the end of a visit: two slots 2 days before due, a reminder on the
+            due date, a call task at Day +3, and closure at Day +14.
           </p>
         </div>
 
