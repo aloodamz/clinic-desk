@@ -209,14 +209,20 @@ export function Shell({ children }: { children: ReactNode }) {
     return null;
   };
 
-  // Command palette matches
+  // Command palette matches (strictly filtered by active role permissions)
   const q = cmdQuery.trim().toLowerCase();
   const matchedScreens = SCREENS.filter(
-    (s) => !q || s.name.toLowerCase().includes(q) || s.blurb.toLowerCase().includes(q),
+    (s) =>
+      levelFor(s.id, role) !== "none" &&
+      (!q || s.name.toLowerCase().includes(q) || s.blurb.toLowerCase().includes(q)),
   );
-  const matchedPatients = state.patients
-    .filter((p) => !q || p.name.toLowerCase().includes(q) || p.phone.includes(q))
-    .slice(0, 5);
+  const canViewPatients = levelFor("patients", role) !== "none";
+  const matchedPatients = canViewPatients
+    ? state.patients
+        .filter((p) => (role === "doctor" && user?.doctorId ? p.assignedDoctorId === user.doctorId : true))
+        .filter((p) => !q || p.name.toLowerCase().includes(q) || p.phone.includes(q))
+        .slice(0, 5)
+    : [];
 
   return (
     <div className="min-h-screen flex bg-[#F4F4F1] text-[#111315]">
@@ -524,8 +530,40 @@ export function Shell({ children }: { children: ReactNode }) {
             </div>
           </header>
 
-          {/* Screen Body */}
-          <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+          {/* Screen Body (with strict RBAC route guard) */}
+          <main className="flex-1 p-6 overflow-y-auto">
+            {pathname !== "/map" && currentAccess === "none" ? (
+              <div className="h-full min-h-[420px] flex items-center justify-center">
+                <div className="card max-w-md w-full text-center flex flex-col items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-[#FEF3F2] border border-[#FECDCA] text-[#B42318] inline-flex items-center justify-center font-bold">
+                    🔒
+                  </span>
+                  <h1 className="font-bold text-[18px] text-[#111315]">
+                    Access Restricted ({ROLES[role]})
+                  </h1>
+                  <p className="text-[13px] text-[#667085]">
+                    Your current role (<strong>{ROLES[role]}</strong>) does not have permission to
+                    access <strong>{currentScreenLabel}</strong>. Switch to an authorized role in
+                    the bottom-left profile switcher or return to an allowed screen.
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Link href="/map" className="btn-ghost btn-sm">
+                      View Role Matrix
+                    </Link>
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      onClick={() => setUser("u_owner")}
+                    >
+                      Switch to Owner
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              children
+            )}
+          </main>
         </div>
       </div>
 

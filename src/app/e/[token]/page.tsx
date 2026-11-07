@@ -1,10 +1,9 @@
 "use client";
 
 import { use, useState } from "react";
-import Link from "next/link";
 import { useStore } from "@/lib/store";
 import { doctorName } from "@/lib/selectors";
-import { fmtDate, rupees } from "@/lib/format";
+import { fmtDate, maskPhone, rupees, todayKey } from "@/lib/format";
 
 export default function EstimatePage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = use(params);
@@ -17,31 +16,34 @@ export default function EstimatePage({ params }: { params: Promise<{ token: stri
 
   if (!state) return null;
 
-  const plan = state.plans.find((p) => p.estimate?.token === token);
+  const isSafeToken = /^est-[a-z0-9-]+$/i.test(token);
+  const plan = isSafeToken ? state.plans.find((p) => p.estimate?.token === token) : undefined;
 
   if (!plan || !plan.estimate) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="card max-w-sm text-center flex flex-col gap-3">
+      <div className="min-h-screen flex items-center justify-center p-6 bg-[#F4F4F1]">
+        <div className="card max-w-sm w-full text-center flex flex-col gap-2.5">
           <h1 className="font-bold text-lg text-[#111315]">Estimate Link Not Found</h1>
           <p className="text-sm text-[#525866]">
-            This estimate link is no longer valid. Please contact the clinic.
+            This estimate link is invalid or no longer active. Please contact{" "}
+            {state.settings.clinicName} at {state.settings.phone}.
           </p>
-          <Link href="/plans" className="btn-ghost btn-sm">
-            ← Back to Staff App
-          </Link>
         </div>
       </div>
     );
   }
 
   const patient = state.patients.find((p) => p.id === plan.patientId)!;
+  const isLocked = plan.estimate.locked;
+  const isExpired = plan.estimate.validUntil < todayKey();
+
   const selectedTotal = plan.items
     .filter((i) => checked.includes(i.id))
     .reduce((s, i) => s + i.cost, 0);
   const fullTotal = plan.items.reduce((s, i) => s + i.cost, 0);
 
   function submitCode() {
+    if (isLocked || isExpired) return;
     const r = verifyEstimateCode(token, code);
     if (r === "ok") {
       setUnlocked(true);
@@ -52,66 +54,95 @@ export default function EstimatePage({ params }: { params: Promise<{ token: stri
     } else if (r === "expired") {
       setError("This estimate has expired (14-day validity). Please contact the clinic.");
     } else {
-      setError("That 4-digit code doesn't match. Please check your WhatsApp message.");
+      setError("That 4-digit code doesn't match. Please check your SMS or WhatsApp message.");
     }
   }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#F4F4F1]">
       <div className="card max-w-md w-full flex flex-col gap-4">
-        <div className="flex items-center justify-between border-b border-[#E6E7EA] pb-3">
-          <div>
-            <div className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-[#868C98]">
-              {state.settings.clinicName} · TREATMENT ESTIMATE
-            </div>
-            <h1 className="font-bold text-[19px] text-[#111315] mt-0.5">{plan.title}</h1>
-            <p className="text-[12.5px] text-[#667085]">
-              Prepared for <strong className="text-[#111315]">{patient.name}</strong> by{" "}
-              {doctorName(state, plan.doctorId)}
-            </p>
+        {/* Header: Zero PII exposed before OTP verification */}
+        <div className="border-b border-[#E6E7EA] pb-3">
+          <div className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-[#868C98]">
+            {state.settings.clinicName} · PROTECTED PATIENT ESTIMATE
           </div>
-          <Link href="/plans" className="btn-ghost btn-xs">
-            Staff View
-          </Link>
+          {unlocked ? (
+            <>
+              <h1 className="font-bold text-[19px] text-[#111315] mt-0.5">{plan.title}</h1>
+              <p className="text-[12.5px] text-[#667085]">
+                Prepared for <strong className="text-[#111315]">{patient.name}</strong> by{" "}
+                {doctorName(state, plan.doctorId)}
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="font-bold text-[19px] text-[#111315] mt-0.5">
+                Verify Your Identity
+              </h1>
+              <p className="text-[12.5px] text-[#667085]">
+                Protected medical &amp; cost estimate · 4-digit verification required
+              </p>
+            </>
+          )}
         </div>
 
         {!unlocked ? (
-          <div className="flex flex-col gap-3">
-            <p className="text-[13px] text-[#525866]">
-              Enter the 4-digit verification code sent to your phone ({patient.phone}) to unlock
-              this treatment estimate.
-            </p>
-            <div className="p-2.5 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA] text-[12px] text-[#525866] flex items-center justify-between">
-              <span>Demo Hint (4-digit OTP code):</span>
+          isLocked ? (
+            <div className="text-[13px] font-medium text-[#B42318] bg-[#FEF3F2] border border-[#FECDCA] rounded-xl p-3.5">
+              This estimate link is locked after 5 unsuccessful attempts. Please call{" "}
+              <strong>{state.settings.clinicName}</strong> at{" "}
+              <span className="tabular-nums">{state.settings.phone}</span> to unlock it.
+            </div>
+          ) : isExpired ? (
+            <div className="text-[13px] font-medium text-[#B54708] bg-[#FFFAEB] border border-[#FEDF89] rounded-xl p-3.5">
+              This treatment estimate expired on {fmtDate(plan.estimate.validUntil)}. Please
+              contact <strong>{state.settings.clinicName}</strong> for an updated plan.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <p className="text-[13px] text-[#525866]">
+                Enter the 4-digit access code sent to your registered phone (
+                <span className="font-mono font-semibold text-[#111315]">
+                  {maskPhone(patient.phone)}
+                </span>
+                ) to view your treatment plan and costs.
+              </p>
+
+              <input
+                aria-label="4-digit access code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                className="w-full tracking-[0.35em] text-center text-[20px] font-bold tabular-nums"
+                maxLength={4}
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && code.length === 4) submitCode();
+                }}
+                placeholder="••••"
+              />
+
+              {error && (
+                <div className="text-[12.5px] font-medium text-[#B42318] bg-[#FEF3F2] border border-[#FECDCA] rounded-xl p-2.5">
+                  {error}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between text-[11.5px] text-[#868C98]">
+                <span>Valid until {fmtDate(plan.estimate.validUntil)}</span>
+                <span>Attempts remaining: {Math.max(0, 5 - plan.estimate.attempts)}/5</span>
+              </div>
+
               <button
                 type="button"
-                onClick={() => setCode(plan.estimate!.code)}
-                className="font-mono font-bold text-[#111315] underline cursor-pointer"
+                className="btn w-full"
+                disabled={code.length !== 4}
+                onClick={submitCode}
               >
-                {plan.estimate.code} (click to fill)
+                Unlock Estimate
               </button>
             </div>
-            <input
-              className="w-full tracking-[0.35em] text-center text-[20px] font-bold tabular-nums"
-              maxLength={4}
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              placeholder="••••"
-            />
-            {error && (
-              <div className="text-[12.5px] font-medium text-[#B42318] bg-[#FEF3F2] border border-[#FECDCA] rounded-xl p-2.5">
-                {error}
-              </div>
-            )}
-            <button
-              type="button"
-              className="btn w-full"
-              disabled={code.length !== 4}
-              onClick={submitCode}
-            >
-              Unlock Estimate
-            </button>
-          </div>
+          )
         ) : submitted ? (
           <div className="text-center py-6 flex flex-col gap-2">
             <div className="w-10 h-10 rounded-full bg-[#ECFDF3] text-[#067647] inline-flex items-center justify-center mx-auto font-bold">
@@ -120,11 +151,9 @@ export default function EstimatePage({ params }: { params: Promise<{ token: stri
             <p className="font-bold text-[16px] text-[#067647]">Choice Recorded</p>
             <p className="text-[13px] text-[#525866]">
               We&apos;ve updated your treatment plan ({checked.length} of {plan.items.length} items
-              accepted). The clinic will reach out on WhatsApp to confirm your slot.
+              accepted). {state.settings.clinicName} will reach out on WhatsApp to confirm your
+              slot.
             </p>
-            <Link href="/plans" className="btn-ghost btn-sm mt-2 self-center">
-              ← Return to Treatment Plans
-            </Link>
           </div>
         ) : (
           <div className="flex flex-col gap-3">

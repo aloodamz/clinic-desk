@@ -8,7 +8,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { aiAnswer, detectLang, isStop, pickReply } from "./ai";
 import { now, nowIso, setRealClock } from "./clock";
 import { AFTERCARE, treatmentCost, treatmentMinutes } from "./dentalPack";
-import { addDays, dayKey, fmtDay, fmtTime12, rupees, todayKey, uid } from "./format";
+import { addDays, dayKey, fmtDay, fmtTime12, rupees, secureHex, secureOtp4, todayKey, uid } from "./format";
 import { HOLDING_REPLY, RECORDS_REPLY, SAFETY_REPLY, checkHandoff, isUnreadable } from "./handoff";
 import { clash, doctorName, findSlots, hasOpenPlan, invoiceTotals } from "./selectors";
 import { STATE_VERSION, buildSeed } from "./seed";
@@ -133,6 +133,49 @@ interface Toast {
   kind: "ok" | "warn" | "bad";
 }
 
+function isValidAppState(v: unknown): v is AppState {
+  if (!v || typeof v !== "object") return false;
+  const s = v as Record<string, unknown>;
+  return (
+    s.version === STATE_VERSION &&
+    typeof s.settings === "object" &&
+    s.settings !== null &&
+    Array.isArray(s.patients) &&
+    Array.isArray(s.appointments) &&
+    Array.isArray(s.conversations) &&
+    Array.isArray(s.handoffs) &&
+    Array.isArray(s.deals) &&
+    Array.isArray(s.plans) &&
+    Array.isArray(s.nextSteps) &&
+    Array.isArray(s.invoices) &&
+    Array.isArray(s.waivers) &&
+    Array.isArray(s.staff)
+  );
+}
+
+function safeParseState(raw: string): AppState | null {
+  try {
+    const parsed: unknown = JSON.parse(raw, (key, value) => {
+      if (key === "__proto__" || key === "constructor" || key === "prototype") {
+        return undefined;
+      }
+      return value;
+    });
+    return isValidAppState(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function timingSafeEqualStr(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
 function useStoreImpl() {
   const [state, setState] = useState<AppState | null>(null);
   const [userId, setUserId] = useState<string>("u_owner");
@@ -147,17 +190,8 @@ function useStoreImpl() {
     const rc = localStorage.getItem(CLOCK_KEY) === "1";
     setRealClock(rc);
     setRealClockState(rc);
-    let s: AppState | null = null;
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as AppState;
-        if (parsed.version === STATE_VERSION) s = parsed;
-      }
-    } catch {
-      /* corrupt state, reseed */
-    }
-    if (!s) s = buildSeed();
+    const raw = localStorage.getItem(KEY);
+    const s = (raw ? safeParseState(raw) : null) ?? buildSeed();
     ref.current = s;
     setState(s);
     const u = localStorage.getItem(USER_KEY);
@@ -525,8 +559,8 @@ function useStoreImpl() {
         return mutate((s) => {
           const pl = s.plans.find((x) => x.id === id)!;
           const p = s.patients.find((x) => x.id === pl.patientId)!;
-          const token = `est-${Math.random().toString(36).slice(2, 8)}`;
-          const code = String(Math.floor(1000 + Math.random() * 9000));
+          const token = `est-${secureHex(8)}`;
+          const code = secureOtp4();
           pl.estimate = { token, code, sentAt: nowIso(), validUntil: addDays(todayKey(), 14), attempts: 0, locked: false };
           pl.status = "sent";
           pl.items.forEach((i) => (i.accepted = undefined));
@@ -540,12 +574,14 @@ function useStoreImpl() {
       /** Public estimate page: code check, locks after 5 wrong tries. */
       verifyEstimateCode(token: string, code: string): "ok" | "wrong" | "locked" | "expired" | "missing" {
         return mutate((s) => {
+          if (!/^est-[a-z0-9-]+$/i.test(token)) return "missing";
           const pl = s.plans.find((x) => x.estimate?.token === token);
           if (!pl?.estimate) return "missing";
           const e = pl.estimate;
           if (e.locked) return "locked";
           if (e.validUntil < todayKey()) return "expired";
-          if (e.code === code.trim()) return "ok";
+          const candidate = code.trim();
+          if (/^\d{4}$/.test(candidate) && timingSafeEqualStr(e.code, candidate)) return "ok";
           e.attempts += 1;
           if (e.attempts >= 5) e.locked = true;
           return e.locked ? "locked" : "wrong";
@@ -647,19 +683,26 @@ function useStoreImpl() {
       },
       recordPayment(id: string, amount: number, method: "link" | "cash" | "upi" | "card") {
         return mutate((s) => {
+          const caller = me();
           const inv = s.invoices.find((x) => x.id === id)!;
+          const safeAmount = Math.max(1, Math.round(Number(amount) || 0));
+          if (caller.role !== "owner" && caller.role !== "front_desk") {
+            return { receiptNo: "DENIED", res: { ok: false as const, reason: "no_consent" as const, detail: "Only Owner or Front Desk may record payments." } };
+          }
           const receiptNo = `R-${inv.number}${inv.payments.length ? String.fromCharCode(65 + inv.payments.length) : ""}`;
-          inv.payments.push({ id: uid("py"), amount, at: nowIso(), method, receiptNo });
+          inv.payments.push({ id: uid("py"), amount: safeAmount, at: nowIso(), method, receiptNo });
           const t = invoiceTotals(inv, s.waivers);
           inv.status = t.due <= 0 ? "paid" : "part_paid";
           const p = s.patients.find((x) => x.id === inv.patientId)!;
-          const res = sendTemplate(s, p.id, "payment_received", [p.name, amount.toLocaleString("en-IN"), receiptNo]);
-          log(s, `${rupees(amount)} received from ${p.name} (${method}). Receipt ${receiptNo}.`);
+          const res = sendTemplate(s, p.id, "payment_received", [p.name, safeAmount.toLocaleString("en-IN"), receiptNo]);
+          log(s, `${rupees(safeAmount)} received from ${p.name} (${method}). Receipt ${receiptNo}.`);
           return { receiptNo, res };
         });
       },
       refundPayment(invoiceId: string, paymentId: string) {
         mutate((s) => {
+          const caller = me();
+          if (caller.role !== "owner" && caller.role !== "front_desk") return;
           const inv = s.invoices.find((x) => x.id === invoiceId)!;
           const py = inv.payments.find((x) => x.id === paymentId)!;
           py.refunded = true;
@@ -670,10 +713,11 @@ function useStoreImpl() {
       },
       requestWaiver(w: Omit<FeeWaiver, "id" | "status" | "createdAt" | "requestedBy">) {
         return mutate((s) => {
-          const fw: FeeWaiver = { ...w, id: uid("w"), status: "pending", createdAt: nowIso(), requestedBy: userId };
+          const safeAmount = Math.max(1, Math.round(Number(w.amount) || 0));
+          const fw: FeeWaiver = { ...w, amount: safeAmount, reason: w.reason.slice(0, 300), id: uid("w"), status: "pending", createdAt: nowIso(), requestedBy: userId };
           s.waivers.push(fw);
           const inv = s.invoices.find((x) => x.id === w.invoiceId)!;
-          log(s, `Fee waiver of ${rupees(w.amount)} asked on invoice ${inv.number}. Waiting on ${doctorName(s, w.approverDoctorId)}.`);
+          log(s, `Fee waiver of ${rupees(safeAmount)} asked on invoice ${inv.number}. Waiting on ${doctorName(s, w.approverDoctorId)}.`);
           return fw;
         });
       },
@@ -681,7 +725,12 @@ function useStoreImpl() {
       /* ----- Approvals ----- */
       decideWaiver(id: string, approve: boolean, via: "app" | "whatsapp" = "app") {
         mutate((s) => {
+          const caller = me();
           const w = s.waivers.find((x) => x.id === id)!;
+          // Enforce clinician/owner sign-off governance
+          if (via === "app" && caller.role !== "owner" && !(caller.role === "doctor" && caller.doctorId === w.approverDoctorId)) {
+            return;
+          }
           w.status = approve ? "approved" : "declined";
           w.decidedAt = nowIso();
           w.via = via;
@@ -696,7 +745,11 @@ function useStoreImpl() {
 
       /* ----- Settings ----- */
       updateSettings(patch: Partial<ClinicSettings>) {
-        mutate((s) => Object.assign(s.settings, patch));
+        mutate((s) => {
+          const caller = me();
+          if (caller.role !== "owner" && caller.role !== "msm_support") return;
+          Object.assign(s.settings, patch);
+        });
       },
       upsertDoctor(d: Doctor) {
         mutate((s) => {
