@@ -90,9 +90,9 @@ export default function TodayPage() {
   ).length;
   const cleanCount = Math.max(0, dayAppts.length - procCount - consultCount);
 
-  const p0 = Math.round((procCount / totalDay) * 100) || 55;
-  const p1 = Math.round((consultCount / totalDay) * 100) || 35;
-  const p2 = Math.max(0, 100 - p0 - p1);
+  const p0 = dayAppts.length > 0 ? Math.round((procCount / totalDay) * 100) : 0;
+  const p1 = dayAppts.length > 0 ? Math.round((consultCount / totalDay) * 100) : 0;
+  const p2 = dayAppts.length > 0 ? Math.max(0, 100 - p0 - p1) : 0;
 
   const attentionItems = [
     ...openHandoffs.map((h) => {
@@ -176,7 +176,6 @@ export default function TodayPage() {
           trend={`${dayAppts.filter((a) => a.isNewPatient).length} new`}
           trendTone="ok"
           icon={KpiIcons.calendar}
-          sparkline={[5, 6, 7, 6, 8, 7, booked || 8]}
         />
         <KpiCard
           label="SEEN"
@@ -185,7 +184,6 @@ export default function TodayPage() {
           trend={`${booked ? Math.round((seen / booked) * 100) : 0}% done`}
           trendTone="neutral"
           icon={KpiIcons.check}
-          sparkline={[2, 3, 4, 3, 5, 4, Math.max(1, seen)]}
         />
         <KpiCard
           label="WAITING"

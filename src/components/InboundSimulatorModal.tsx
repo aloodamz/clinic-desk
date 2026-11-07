@@ -61,19 +61,26 @@ export function InboundSimulatorModal({ open, onClose }: { open: boolean; onClos
   }
 
   return (
-    <div className="overlay" onClick={onClose}>
+    <div
+      className="overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="sim-modal-title"
+      onClick={onClose}
+    >
       <div className="modal !max-w-lg" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between gap-3 mb-4">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-[0.07em] text-[#868C98]">
               TEST PATIENT MESSAGE
             </div>
-            <h2 className="font-bold text-[17px] text-[#111315] mt-0.5">
+            <h2 id="sim-modal-title" className="font-bold text-[17px] text-[#111315] mt-0.5">
               Send a Test Patient Reply
             </h2>
           </div>
           <button
             type="button"
+            aria-label="Close modal"
             onClick={onClose}
             className="w-7 h-7 rounded-lg border border-[#E6E7EA] text-[#667085] hover:text-[#111315] inline-flex items-center justify-center cursor-pointer"
           >

@@ -33,6 +33,7 @@ export default function InboxPage() {
     (b.lastInboundAt ?? "").localeCompare(a.lastInboundAt ?? ""),
   );
   const [selId, setSelId] = useState<string | null>(sorted[0]?.id ?? null);
+  const [mobileShowThread, setMobileShowThread] = useState(false);
   const [search, setSearch] = useState("");
   const [modeFilter, setModeFilter] = useState<"all" | "staff" | "ai">("all");
   const [draft, setDraft] = useState("");
@@ -86,7 +87,11 @@ export default function InboxPage() {
   return (
     <div className="w-full h-[calc(100vh-108px)] min-h-[580px] bg-white border border-[#E6E7EA] rounded-2xl overflow-hidden flex shadow-[0_1px_2px_rgba(16,24,40,0.02)]">
       {/* Left Column: Conversation List */}
-      <div className="w-[330px] shrink-0 border-r border-[#E6E7EA] flex flex-col bg-white">
+      <div
+        className={`${
+          mobileShowThread ? "hidden md:flex" : "flex"
+        } w-full md:w-[320px] shrink-0 md:border-r border-[#E6E7EA] flex-col bg-white`}
+      >
         <div className="p-3.5 border-b border-[#E6E7EA] flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -100,6 +105,7 @@ export default function InboxPage() {
 
           <input
             type="search"
+            aria-label="Search conversations"
             placeholder="Search patient, phone, message…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -139,10 +145,14 @@ export default function InboxPage() {
             const last = c.messages[c.messages.length - 1];
             const active = c.id === sel?.id;
             return (
-              <div
+              <button
                 key={c.id}
-                onClick={() => setSelId(c.id)}
-                className={`p-3.5 cursor-pointer transition-colors ${
+                type="button"
+                onClick={() => {
+                  setSelId(c.id);
+                  setMobileShowThread(true);
+                }}
+                className={`w-full text-left p-3.5 cursor-pointer transition-colors ${
                   active ? "bg-[#F4F4F1]" : "hover:bg-[#FAFAFA]"
                 }`}
               >
@@ -192,7 +202,7 @@ export default function InboxPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </button>
             );
           })}
           {filtered.length === 0 && (
@@ -205,10 +215,22 @@ export default function InboxPage() {
 
       {/* Center Column: Active Thread & Composer */}
       {sel ? (
-        <div className="flex-1 flex flex-col min-w-0 bg-[#FAFAFA]">
+        <div
+          className={`${
+            mobileShowThread ? "flex" : "hidden md:flex"
+          } flex-1 flex-col min-w-0 bg-[#FAFAFA]`}
+        >
           {/* Thread Header */}
-          <div className="px-5 py-3 bg-white border-b border-[#E6E7EA] flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-3 min-w-0">
+          <div className="px-4 sm:px-5 py-3 bg-white border-b border-[#E6E7EA] flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <button
+                type="button"
+                onClick={() => setMobileShowThread(false)}
+                className="btn-ghost btn-xs md:hidden"
+                aria-label="Back to conversation list"
+              >
+                ← Chats
+              </button>
               <Avatar name={sel.contactName} size={36} />
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -424,7 +446,7 @@ export default function InboxPage() {
                   href={`/patients?id=${linkedPatient.id}`}
                   className="btn-ghost btn-xs w-full mt-1"
                 >
-                  Open Full Dossier ›
+                  Open Patient Record ›
                 </Link>
               </div>
 

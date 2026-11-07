@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { addDays, fmtDay, initials, todayKey } from "@/lib/format";
 
 const AVATAR_TONES = [
@@ -142,7 +142,19 @@ export function KpiCard({
 
   return (
     <div
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
       onClick={onClick}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
       className={`bg-white border border-[#E6E7EA] rounded-2xl p-4.5 flex flex-col justify-between gap-3 shadow-[0_1px_2px_rgba(16,24,40,0.02)] transition-all ${
         onClick ? "cursor-pointer hover:border-[#18181B]/30 hover:shadow-sm" : ""
       }`}
@@ -150,7 +162,10 @@ export function KpiCard({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {icon && (
-            <span className="w-6 h-6 rounded-lg bg-[#F4F4F5] border border-[#E4E4E7] inline-flex items-center justify-center text-[#18181B] shrink-0">
+            <span
+              aria-hidden="true"
+              className="w-6 h-6 rounded-lg bg-[#F4F4F5] border border-[#E4E4E7] inline-flex items-center justify-center text-[#18181B] shrink-0"
+            >
               {icon}
             </span>
           )}
@@ -158,7 +173,11 @@ export function KpiCard({
             {label}
           </span>
         </div>
-        <span className="text-[#98A2B3] text-xs select-none tracking-widest">•••</span>
+        {onClick && (
+          <span aria-hidden="true" className="text-[#667085] text-xs font-semibold select-none">
+            ›
+          </span>
+        )}
       </div>
 
       <div className="flex items-baseline gap-2.5">
@@ -183,6 +202,7 @@ export function KpiCard({
 }
 
 function MiniSparkline({ points }: { points: number[] }) {
+  const gradId = useId();
   const w = 78;
   const h = 26;
   const min = Math.min(...points);
@@ -196,14 +216,20 @@ function MiniSparkline({ points }: { points: number[] }) {
   const area = `${line} L${w - 2},${h} L2,${h} Z`;
 
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="shrink-0 overflow-visible">
+    <svg
+      width={w}
+      height={h}
+      viewBox={`0 0 ${w} ${h}`}
+      aria-hidden="true"
+      className="shrink-0 overflow-visible"
+    >
       <defs>
-        <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#2563EB" stopOpacity="0.22" />
           <stop offset="100%" stopColor="#2563EB" stopOpacity="0.0" />
         </linearGradient>
       </defs>
-      <path d={area} fill="url(#sparkFill)" />
+      <path d={area} fill={`url(#${gradId})`} />
       <path d={line} fill="none" stroke="#2563EB" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -245,6 +271,8 @@ export function DateStrip({
             <button
               key={d}
               type="button"
+              aria-pressed={active}
+              aria-label={`${fmtDay(d)}, ${count} visits`}
               onClick={() => onSelectDate(d)}
               className={`px-3.5 py-1.5 rounded-lg flex flex-col items-center min-w-[54px] transition-all cursor-pointer ${
                 active
@@ -465,7 +493,11 @@ export function WeeklyStackedChart({
           return (
             <div
               key={d.day}
+              tabIndex={0}
+              role="group"
+              aria-label={`${d.day}: ${d.completed} completed, ${d.booked} booked, ${d.inquiry} enquiries`}
               onMouseEnter={() => setHoverIdx(idx)}
+              onFocus={() => setHoverIdx(idx)}
               className="flex flex-col items-center gap-2 h-full justify-end relative cursor-pointer group"
             >
               {isHover && (

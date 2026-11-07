@@ -42,6 +42,19 @@
   --info: #175cd3;
   --info-bg: #eff8ff;
   --info-border: #b2ddff;
+
+  /* Screen domain tokens referenced by src/lib/access.ts */
+  --c-today: #1d6b52;
+  --c-inbox: #175cd3;
+  --c-hand: #b42318;
+  --c-pat: #067647;
+  --c-pipe: #5925dc;
+  --c-plans: #026aa2;
+  --c-fu: #b54708;
+  --c-bill: #18181b;
+  --c-appr: #b54708;
+  --c-dash: #2563eb;
+  --c-set: #525866;
 }
 
 @theme {
@@ -402,4 +415,26 @@ tbody tr.active-row {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 40px -12px rgba(16, 24, 40, 0.2), 0 0 0 1px rgba(16, 24, 40, 0.04);
+}
+
+/* WCAG 2.2 AA Keyboard Focus Ring */
+.btn:focus-visible,
+.btn-ghost:focus-visible,
+.seg-btn:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Reduced-Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

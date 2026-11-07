@@ -63,15 +63,18 @@ export default function DashboardPage() {
     ...FUNNEL_STAGES.map((st) => newDeals.filter((d) => d.stage === st).length),
   );
 
-  const weeklyDays = [
-    { day: "Sun", completed: 4, booked: 3, inquiry: 2 },
-    { day: "Mon", completed: 7, booked: 5, inquiry: 4 },
-    { day: "Tue", completed: 11, booked: 6, inquiry: 5 },
-    { day: "Wed", completed: 9, booked: 7, inquiry: 4 },
-    { day: "Thu", completed: 8, booked: 5, inquiry: 3 },
-    { day: "Fri", completed: 6, booked: 4, inquiry: 3 },
-    { day: "Sat", completed: 8, booked: 4, inquiry: 2 },
-  ];
+  const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+  const weeklyDays = DAY_NAMES.map((day, dow) => {
+    const dayAppts = scopedAppts.filter(
+      (a) => a.status !== "cancelled" && new Date(a.start).getDay() === dow,
+    );
+    const completed = dayAppts.filter((a) => a.status === "completed").length;
+    const booked = dayAppts.filter((a) => a.status !== "completed").length;
+    const inquiry = state.conversations.filter(
+      (c) => c.lastInboundAt && new Date(c.lastInboundAt).getDay() === dow,
+    ).length;
+    return { day, completed, booked, inquiry };
+  });
 
   const openHandoffs = state.handoffs.filter((h) => h.status === "open").length;
   const highPriorityHandoffs = state.handoffs.filter(
@@ -126,7 +129,40 @@ export default function DashboardPage() {
           <button
             type="button"
             className="btn-ghost"
-            onClick={() => toast("Exported summary CSV.", "ok")}
+            onClick={() => {
+              const rows = [
+                isFunnelOnly
+                  ? ["Doctor", "Specialty", "Booked Visits", "Completed Visits"]
+                  : ["Doctor", "Specialty", "Booked Visits", "Completed Visits", "Collected (INR)"],
+                ...state.doctors.map((d) => {
+                  const docAppts = state.appointments.filter(
+                    (a) => a.doctorId === d.id && a.status !== "cancelled",
+                  );
+                  const docDone = docAppts.filter((a) => a.status === "completed").length;
+                  const docCollected = state.invoices
+                    .filter((inv) => inv.doctorId === d.id)
+                    .reduce((s, inv) => s + invoiceTotals(inv, state.waivers).paid, 0);
+                  return isFunnelOnly
+                    ? [d.name, d.specialty, String(docAppts.length), String(docDone)]
+                    : [
+                        d.name,
+                        d.specialty,
+                        String(docAppts.length),
+                        String(docDone),
+                        String(docCollected),
+                      ];
+                }),
+              ];
+              const csv = rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(",")).join("\n");
+              const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = "clinicdesk-summary.csv";
+              link.click();
+              URL.revokeObjectURL(url);
+              toast("Downloaded clinicdesk-summary.csv.", "ok");
+            }}
           >
             ↓ Export CSV
           </button>
@@ -144,7 +180,6 @@ export default function DashboardPage() {
               trend={`${newDeals.filter((d) => d.stage === "Booked" || d.stage === "Showed").length} booked/showed`}
               trendTone="info"
               icon={KpiIcons.users}
-              sparkline={[5, 8, 7, 10, 9, 12, Math.max(4, newDeals.length)]}
             />
             <KpiCard
               label="OPEN NEXT STEPS"
@@ -153,7 +188,6 @@ export default function DashboardPage() {
               trend={openSteps > 0 ? "Needs follow-up" : "Clear"}
               trendTone={openSteps > 0 ? "warn" : "ok"}
               icon={KpiIcons.note}
-              sparkline={[6, 5, 7, 8, 6, 5, Math.max(2, openSteps)]}
             />
           </>
         ) : (
@@ -169,7 +203,6 @@ export default function DashboardPage() {
               trend={`${paidInvoicesCount} paid`}
               trendTone="ok"
               icon={KpiIcons.rupee}
-              sparkline={[12, 18, 15, 22, 19, 26, 29]}
             />
             <KpiCard
               label="PENDING DUES"
@@ -178,7 +211,6 @@ export default function DashboardPage() {
               trend={due > 0 ? `${unpaidInvoicesCount} open` : "Clear"}
               trendTone={due > 0 ? "warn" : "ok"}
               icon={KpiIcons.note}
-              sparkline={[9, 12, 10, 8, 11, 7, 6]}
             />
           </>
         )}
@@ -189,7 +221,6 @@ export default function DashboardPage() {
           trend={`${scheduledVisits ? Math.round((completedVisits / scheduledVisits) * 100) : 0}% done`}
           trendTone="ok"
           icon={KpiIcons.check}
-          sparkline={[4, 6, 5, 8, 7, 9, Math.max(5, completedVisits)]}
         />
         <KpiCard
           label="WHATSAPP SPEND"
