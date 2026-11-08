@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useState } from "react";
+import { MdOutlineCheckCircle } from "react-icons/md";
 import { useStore } from "@/lib/store";
 import { doctorName } from "@/lib/selectors";
 import { fmtDate, maskPhone, rupees, todayKey } from "@/lib/format";
@@ -145,8 +146,8 @@ export default function EstimatePage({ params }: { params: Promise<{ token: stri
           )
         ) : submitted ? (
           <div className="text-center py-6 flex flex-col gap-2">
-            <div className="w-10 h-10 rounded-full bg-[#ECFDF3] text-[#067647] inline-flex items-center justify-center mx-auto font-bold">
-              ✓
+            <div className="text-[#067647] inline-flex items-center justify-center mx-auto">
+              <MdOutlineCheckCircle size={34} />
             </div>
             <p className="font-bold text-[16px] text-[#067647]">Choice Recorded</p>
             <p className="text-[13px] text-[#525866]">

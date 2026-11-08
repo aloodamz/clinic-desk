@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { MdCheck } from "react-icons/md";
 import { useStore } from "@/lib/store";
 import { ROLES } from "@/lib/access";
 import { RULES, ruleDef } from "@/lib/handoff";
@@ -227,8 +228,9 @@ export default function HandoffsPage() {
                     </div>
                   ) : (
                     <div className="flex items-center justify-between text-[12.5px] text-[#067647] bg-[#ECFDF3] border border-[#ABEFC6] rounded-xl px-3.5 py-2">
-                      <span>
-                        ✓ Resolved: <strong className="font-semibold">{h.note}</strong>
+                      <span className="inline-flex items-center gap-1">
+                        <MdCheck size={14} />
+                        Resolved: <strong className="font-semibold">{h.note}</strong>
                       </span>
                       {h.resolvedAt && <span>{ago(h.resolvedAt)}</span>}
                     </div>

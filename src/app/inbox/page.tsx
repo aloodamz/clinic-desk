@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { MdOutlineWarningAmber, MdChevronLeft } from "react-icons/md";
 import { useStore } from "@/lib/store";
 import { doctorName } from "@/lib/selectors";
 import { ago, fmtDay, fmtTime, rupeesPaise } from "@/lib/format";
@@ -195,7 +196,7 @@ export default function InboxPage() {
                       </span>
                       <span className="chip sm no-dot uppercase">{c.lang}</span>
                       {c.unread > 0 && (
-                        <span className="ml-auto bg-[#D92D20] text-white text-[10.5px] font-bold px-1.5 py-0.2 rounded-full">
+                        <span className="ml-auto bg-[#D92D20] text-white text-[10.5px] font-bold px-1.5 py-0.5 rounded-full">
                           {c.unread}
                         </span>
                       )}
@@ -229,7 +230,7 @@ export default function InboxPage() {
                 className="btn-ghost btn-xs md:hidden"
                 aria-label="Back to conversation list"
               >
-                ← Chats
+                <MdChevronLeft size={14} className="inline -mt-0.5" /> Chats
               </button>
               <Avatar name={sel.contactName} size={36} />
               <div className="min-w-0">
@@ -348,8 +349,9 @@ export default function InboxPage() {
                   </div>
                   <div className="leading-relaxed whitespace-pre-wrap">{m.text}</div>
                   {m.status === "blocked" && (
-                    <div className="mt-1.5 text-[11.5px] font-semibold text-[#B42318]">
-                      ⚠ Blocked by Send Gate ({m.blockReason}): {m.blockDetail}
+                    <div className="mt-1.5 text-[11.5px] font-semibold text-[#B42318] flex items-start gap-1">
+                      <MdOutlineWarningAmber size={13} className="mt-[1px] shrink-0" />
+                      <span>Blocked by Send Gate ({m.blockReason}): {m.blockDetail}</span>
                     </div>
                   )}
                 </div>

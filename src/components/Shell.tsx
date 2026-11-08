@@ -3,6 +3,27 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import {
+  MdOutlineToday,
+  MdOutlineDashboard,
+  MdOutlineGroup,
+  MdOutlineInbox,
+  MdOutlineReportProblem,
+  MdOutlineViewKanban,
+  MdOutlineDescription,
+  MdOutlineUpdate,
+  MdOutlineCreditCard,
+  MdOutlineFactCheck,
+  MdOutlineSettings,
+  MdOutlineMap,
+  MdMenu,
+  MdClose,
+  MdChevronLeft,
+  MdChevronRight,
+  MdSearch,
+  MdOutlineNotifications,
+  MdOutlineLock,
+} from "react-icons/md";
 import { useStore } from "@/lib/store";
 import { LEVEL_LABEL, ROLES, SCREENS, levelFor } from "@/lib/access";
 import type { ScreenId } from "@/lib/types";
@@ -22,84 +43,17 @@ interface NavGroup {
 }
 
 const ICONS: Record<ScreenId, ReactNode> = {
-  today: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-  ),
-  dashboard: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="9" rx="1.5" />
-      <rect x="14" y="3" width="7" height="5" rx="1.5" />
-      <rect x="14" y="12" width="7" height="9" rx="1.5" />
-      <rect x="3" y="16" width="7" height="5" rx="1.5" />
-    </svg>
-  ),
-  patients: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  ),
-  inbox: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
-  ),
-  handoffs: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-      <line x1="12" y1="9" x2="12" y2="13" />
-      <line x1="12" y1="17" x2="12.01" y2="17" />
-    </svg>
-  ),
-  pipeline: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="8" y1="6" x2="21" y2="6" />
-      <line x1="8" y1="12" x2="21" y2="12" />
-      <line x1="8" y1="18" x2="21" y2="18" />
-      <line x1="3" y1="6" x2="3.01" y2="6" />
-      <line x1="3" y1="12" x2="3.01" y2="12" />
-      <line x1="3" y1="18" x2="3.01" y2="18" />
-    </svg>
-  ),
-  plans: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <polyline points="14 2 14 8 20 8" />
-      <line x1="16" y1="13" x2="8" y2="13" />
-      <line x1="16" y1="17" x2="8" y2="17" />
-    </svg>
-  ),
-  followups: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="23 4 23 10 17 10" />
-      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-    </svg>
-  ),
-  billing: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-      <line x1="1" y1="10" x2="23" y2="10" />
-    </svg>
-  ),
-  approvals: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 11l3 3L22 4" />
-      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-    </svg>
-  ),
-  settings: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-    </svg>
-  ),
+  today: <MdOutlineToday size={15} />,
+  dashboard: <MdOutlineDashboard size={15} />,
+  patients: <MdOutlineGroup size={15} />,
+  inbox: <MdOutlineInbox size={15} />,
+  handoffs: <MdOutlineReportProblem size={15} />,
+  pipeline: <MdOutlineViewKanban size={15} />,
+  plans: <MdOutlineDescription size={15} />,
+  followups: <MdOutlineUpdate size={15} />,
+  billing: <MdOutlineCreditCard size={15} />,
+  approvals: <MdOutlineFactCheck size={15} />,
+  settings: <MdOutlineSettings size={15} />,
 };
 
 const NAV_GROUPS: NavGroup[] = [
@@ -249,7 +203,7 @@ export function Shell({ children }: { children: ReactNode }) {
           mobileNavOpen
             ? "fixed inset-y-0 left-0 z-50 w-[256px] flex bg-[#F4F4F1] border-r border-[#E6E7EA] shadow-2xl"
             : "hidden lg:flex"
-        } shrink-0 flex-col justify-between py-3.5 px-3 select-none transition-all duration-150`}
+        } shrink-0 flex-col justify-between py-3.5 px-3 select-none transition-all duration-150 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto`}
       >
         <div className="flex flex-col gap-5">
           {/* Brand Header */}
@@ -281,7 +235,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 className="w-6 h-6 rounded-md text-[#868C98] hover:text-[#111315] hover:bg-black/5 inline-flex items-center justify-center lg:hidden"
                 aria-label="Close navigation menu"
               >
-                ✕
+                <MdClose size={15} />
               </button>
             ) : (
               !collapsed && (
@@ -292,10 +246,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   title="Collapse sidebar"
                   aria-label="Collapse sidebar"
                 >
-                  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <line x1="9" y1="3" x2="9" y2="21" />
-                  </svg>
+                  <MdChevronLeft size={16} />
                 </button>
               )
             )}
@@ -355,7 +306,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
                       {!collapsed && badge && (
                         <span
-                          className={`text-[10.5px] font-bold px-1.5 py-0.2 rounded-full tabular-nums ${
+                          className={`text-[10.5px] font-bold px-1.5 py-0.5 rounded-full tabular-nums ${
                             active
                               ? "bg-white/20 text-white"
                               : badge.urgent
@@ -387,11 +338,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     : "text-[#525866] hover:bg-black/[0.04] hover:text-[#111315]"
                 }`}
               >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
-                  <line x1="8" y1="2" x2="8" y2="18" />
-                  <line x1="16" y1="6" x2="16" y2="22" />
-                </svg>
+                <MdOutlineMap size={15} />
                 {!collapsed && <span>Architecture Map</span>}
               </Link>
             </div>
@@ -418,7 +365,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     aria-label="Switch staff role"
                     value={userId}
                     onChange={(e) => setUser(e.target.value)}
-                    className="!border-0 !bg-transparent !p-0 !shadow-none font-bold text-[12.5px] text-[#111315] w-full truncate cursor-pointer focus:!ring-0"
+                    className="select-bare !border-0 !bg-transparent !shadow-none font-bold text-[12.5px] text-[#111315] w-full truncate cursor-pointer focus:!ring-0"
                   >
                     {state.staff
                       .filter((s) => s.active)
@@ -438,10 +385,11 @@ export function Shell({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => setCollapsed(false)}
-                className="text-xs text-[#525866]"
+                className="w-6 h-6 rounded-md text-[#868C98] hover:text-[#111315] hover:bg-black/5 transition-colors inline-flex items-center justify-center"
                 title="Expand sidebar"
+                aria-label="Expand sidebar"
               >
-                ›
+                <MdChevronRight size={16} />
               </button>
             )}
           </div>
@@ -462,7 +410,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 title="Open navigation menu"
                 aria-label="Open navigation menu"
               >
-                ☰
+                <MdMenu size={17} />
               </button>
               {collapsed && (
                 <button
@@ -472,13 +420,13 @@ export function Shell({ children }: { children: ReactNode }) {
                   title="Expand sidebar"
                   aria-label="Expand sidebar"
                 >
-                  ☰
+                  <MdMenu size={16} />
                 </button>
               )}
               <span className="hidden sm:inline text-[11px] font-bold uppercase tracking-[0.08em] text-[#868C98]">
                 {currentGroup}
               </span>
-              <span className="hidden sm:inline text-[#D0D5DD] text-xs">›</span>
+              <MdChevronRight size={14} className="hidden sm:inline text-[#D0D5DD]" />
               <span className="text-[13.5px] font-bold text-[#111315] truncate">
                 {currentScreenLabel}
               </span>
@@ -495,13 +443,10 @@ export function Shell({ children }: { children: ReactNode }) {
                 className="hidden md:flex items-center justify-between gap-6 bg-[#F8F8F6] hover:bg-[#F1F1EE] border border-[#E6E7EA] rounded-xl px-3 py-1.5 text-[12.5px] text-[#667085] w-[240px] transition cursor-pointer"
               >
                 <span className="flex items-center gap-2 truncate">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8" />
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
+                  <MdSearch size={15} />
                   <span>Go to or command…</span>
                 </span>
-                <kbd className="text-[10.5px] font-semibold bg-white border border-[#E6E7EA] rounded px-1.5 py-0.2 text-[#525866] shadow-2xs">
+                <kbd className="text-[10.5px] font-semibold bg-white border border-[#E6E7EA] rounded px-1.5 py-0.5 text-[#525866] shadow-2xs">
                   ⌘K
                 </kbd>
               </button>
@@ -538,10 +483,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   className="w-8 h-8 rounded-xl bg-[#F8F8F6] hover:bg-[#F1F1EE] border border-[#E6E7EA] inline-flex items-center justify-center text-[#525866] relative cursor-pointer"
                   aria-label="Notifications"
                 >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                  </svg>
+                  <MdOutlineNotifications size={16} />
                   {totalAlerts > 0 && (
                     <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#D92D20] text-white text-[10px] font-bold inline-flex items-center justify-center">
                       {totalAlerts}
@@ -585,8 +527,8 @@ export function Shell({ children }: { children: ReactNode }) {
             {pathname !== "/map" && currentAccess === "none" ? (
               <div className="h-full min-h-[420px] flex items-center justify-center">
                 <div className="card max-w-md w-full text-center flex flex-col items-center gap-3">
-                  <span className="w-10 h-10 rounded-full bg-[#FEF3F2] border border-[#FECDCA] text-[#B42318] inline-flex items-center justify-center font-bold">
-                    🔒
+                  <span className="text-[#B42318] inline-flex items-center justify-center">
+                    <MdOutlineLock size={28} />
                   </span>
                   <h1 className="font-bold text-[18px] text-[#111315]">
                     Access Restricted ({ROLES[role]})
@@ -647,7 +589,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => setCmdOpen(false)}
-                className="text-xs text-[#868C98] px-1.5 py-0.5 border border-[#E6E7EA] rounded bg-white"
+                className="text-xs text-[#868C98] px-1.5 py-0.5 border border-[#E6E7EA] rounded bg-white hover:bg-[#F4F4F5] hover:text-[#111315] transition-colors"
               >
                 ESC
               </button>

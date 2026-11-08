@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { useStore } from "@/lib/store";
 import { ago, rupees } from "@/lib/format";
 import { Avatar } from "@/components/ui";
@@ -104,7 +105,7 @@ export default function PipelinePage() {
                 className={`seg-btn ${board === b.id ? "active" : ""}`}
               >
                 <span>{b.label}</span>
-                <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-black/5 tabular-nums">
+                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-black/5 tabular-nums">
                   {count}
                 </span>
               </button>
@@ -146,7 +147,7 @@ export default function PipelinePage() {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#18181B]" />
                   <span className="font-bold text-[12.5px] text-[#111315]">{st}</span>
-                  <span className="text-[11px] font-bold px-1.5 py-0.2 rounded-full bg-white border border-[#E6E7EA] text-[#525866] tabular-nums">
+                  <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-white border border-[#E6E7EA] text-[#525866] tabular-nums">
                     {items.length}
                   </span>
                 </div>
@@ -214,7 +215,7 @@ export default function PipelinePage() {
                           toast(`Moved ${name} to ${stages[idx - 1]}.`, "ok");
                         }}
                       >
-                        ←
+                        <MdChevronLeft size={14} />
                       </button>
                       <select
                         aria-label="Move stage"
@@ -224,7 +225,7 @@ export default function PipelinePage() {
                           moveDealStage(d.id, next);
                           toast(`Moved ${name} to ${next}.`, "ok");
                         }}
-                        className="!py-1 !px-2 !text-[11px] font-semibold flex-1 text-center"
+                        className="select-compact font-semibold flex-1"
                       >
                         {stages.map((s) => (
                           <option key={s} value={s}>
@@ -241,7 +242,7 @@ export default function PipelinePage() {
                           toast(`Moved ${name} to ${stages[idx + 1]}.`, "ok");
                         }}
                       >
-                        →
+                        <MdChevronRight size={14} />
                       </button>
                     </div>
                   </div>

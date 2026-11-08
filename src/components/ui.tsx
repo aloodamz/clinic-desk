@@ -1,6 +1,18 @@
 "use client";
 
 import { useId, useState, type ReactNode } from "react";
+import {
+  MdOutlineCalendarToday,
+  MdOutlineCheckCircle,
+  MdOutlineHourglassEmpty,
+  MdOutlineDescription,
+  MdOutlineGroup,
+  MdOutlineCurrencyRupee,
+  MdOutlineWarningAmber,
+  MdOutlineChatBubbleOutline,
+  MdChevronLeft,
+  MdChevronRight,
+} from "react-icons/md";
 import { addDays, fmtDay, initials, todayKey } from "@/lib/format";
 
 const AVATAR_TONES = [
@@ -46,65 +58,16 @@ export function Avatar({
   );
 }
 
-/** Crisp SVG icons for KPI headers matching Pulse Clinic & Mitrasehat */
+/** Material Design icons for KPI headers matching Pulse Clinic & Mitrasehat */
 export const KpiIcons = {
-  calendar: (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-  ),
-  check: (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-      <polyline points="22 4 12 14.01 9 11.01" />
-    </svg>
-  ),
-  hourglass: (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  ),
-  note: (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <polyline points="14 2 14 8 20 8" />
-      <line x1="16" y1="13" x2="8" y2="13" />
-      <line x1="16" y1="17" x2="8" y2="17" />
-    </svg>
-  ),
-  users: (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  ),
-  rupee: (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 3h12" />
-      <path d="M6 8h12" />
-      <path d="m6 13 8.5 8" />
-      <path d="M6 13h3" />
-      <path d="M9 13c6.667 0 6.667-10 0-10" />
-    </svg>
-  ),
-  alert: (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-      <line x1="12" y1="9" x2="12" y2="13" />
-      <line x1="12" y1="17" x2="12.01" y2="17" />
-    </svg>
-  ),
-  message: (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
-  ),
+  calendar: <MdOutlineCalendarToday size={13} />,
+  check: <MdOutlineCheckCircle size={13} />,
+  hourglass: <MdOutlineHourglassEmpty size={13} />,
+  note: <MdOutlineDescription size={13} />,
+  users: <MdOutlineGroup size={13} />,
+  rupee: <MdOutlineCurrencyRupee size={13} />,
+  alert: <MdOutlineWarningAmber size={13} />,
+  message: <MdOutlineChatBubbleOutline size={13} />,
 };
 
 export function KpiCard({
@@ -164,7 +127,7 @@ export function KpiCard({
           {icon && (
             <span
               aria-hidden="true"
-              className="w-6 h-6 rounded-lg bg-[#F4F4F5] border border-[#E4E4E7] inline-flex items-center justify-center text-[#18181B] shrink-0"
+              className="inline-flex items-center justify-center text-[#18181B] shrink-0"
             >
               {icon}
             </span>
@@ -174,8 +137,8 @@ export function KpiCard({
           </span>
         </div>
         {onClick && (
-          <span aria-hidden="true" className="text-[#667085] text-xs font-semibold select-none">
-            ›
+          <span aria-hidden="true" className="text-[#667085] select-none inline-flex">
+            <MdChevronRight size={14} />
           </span>
         )}
       </div>
@@ -253,10 +216,10 @@ export function DateStrip({
       <button
         type="button"
         onClick={() => onSelectDate(addDays(selectedDate, -1))}
-        className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-[#525866] hover:bg-white hover:shadow-xs transition cursor-pointer font-bold"
+        className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-[#525866] hover:bg-white hover:shadow-xs transition cursor-pointer"
         title="Previous day"
       >
-        ‹
+        <MdChevronLeft size={18} />
       </button>
 
       <div className="flex items-center gap-1 overflow-x-auto flex-1 justify-around">
@@ -313,10 +276,10 @@ export function DateStrip({
       <button
         type="button"
         onClick={() => onSelectDate(addDays(selectedDate, 1))}
-        className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-[#525866] hover:bg-white hover:shadow-xs transition cursor-pointer font-bold"
+        className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-[#525866] hover:bg-white hover:shadow-xs transition cursor-pointer"
         title="Next day"
       >
-        ›
+        <MdChevronRight size={18} />
       </button>
     </div>
   );
@@ -462,7 +425,7 @@ export function WeeklyStackedChart({
       <div className="flex items-start justify-between gap-3 mb-4">
         <div>
           <div className="flex items-center gap-2 text-[11.5px] font-bold uppercase tracking-[0.06em] text-[#525866] mb-1">
-            <span className="w-6 h-6 rounded-lg bg-[#EFF8FF] border border-[#B2DDFF] text-[#175CD3] inline-flex items-center justify-center">
+            <span className="text-[#175CD3] inline-flex items-center justify-center">
               {KpiIcons.users}
             </span>
             Patient Statistics

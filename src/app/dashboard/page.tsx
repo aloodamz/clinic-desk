@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { MdOutlineLightbulb, MdOutlineShield, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { useStore } from "@/lib/store";
 import { invoiceTotals } from "@/lib/selectors";
 import { rupees, rupeesPaise } from "@/lib/format";
@@ -376,7 +377,7 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-2">
                           <div className="flex-1 h-2 bg-[#F2F3F5] rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-[#18181B] rounded-full"
+                              className="h-full bg-[#18181B] rounded-full transition-all"
                               style={{ width: `${Math.max(15, pct)}%` }}
                             />
                           </div>
@@ -405,8 +406,8 @@ export default function DashboardPage() {
 
             <div className="flex flex-col gap-2.5">
               <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA] flex items-start gap-3">
-                <span className="w-7 h-7 rounded-lg bg-[#FFFAEB] border border-[#FEDF89] text-[#B54708] inline-flex items-center justify-center shrink-0 text-sm">
-                  💡
+                <span className="text-[#B54708] inline-flex items-center justify-center shrink-0 mt-0.5">
+                  <MdOutlineLightbulb size={17} />
                 </span>
                 <div>
                   <div className="font-semibold text-[13px] text-[#111315]">
@@ -420,8 +421,8 @@ export default function DashboardPage() {
               </div>
 
               <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA] flex items-start gap-3">
-                <span className="w-7 h-7 rounded-lg bg-[#ECFDF3] border border-[#ABEFC6] text-[#067647] inline-flex items-center justify-center shrink-0 text-sm">
-                  🛡️
+                <span className="text-[#067647] inline-flex items-center justify-center shrink-0 mt-0.5">
+                  <MdOutlineShield size={17} />
                 </span>
                 <div>
                   <div className="font-semibold text-[13px] text-[#111315]">
@@ -436,8 +437,8 @@ export default function DashboardPage() {
               </div>
 
               <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA] flex items-start gap-3">
-                <span className="w-7 h-7 rounded-lg bg-[#EFF8FF] border border-[#B2DDFF] text-[#175CD3] inline-flex items-center justify-center shrink-0 text-sm">
-                  💬
+                <span className="text-[#175CD3] inline-flex items-center justify-center shrink-0 mt-0.5">
+                  <MdOutlineChatBubbleOutline size={17} />
                 </span>
                 <div className="flex-1">
                   <div className="font-semibold text-[13px] text-[#111315]">

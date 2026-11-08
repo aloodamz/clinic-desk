@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MdClose, MdOutlineMic } from "react-icons/md";
 import { useStore } from "@/lib/store";
 import { Avatar } from "./ui";
 
@@ -84,7 +85,7 @@ export function InboundSimulatorModal({ open, onClose }: { open: boolean; onClos
             onClick={onClose}
             className="w-7 h-7 rounded-lg border border-[#E6E7EA] text-[#667085] hover:text-[#111315] inline-flex items-center justify-center cursor-pointer"
           >
-            ✕
+            <MdClose size={15} />
           </button>
         </div>
 
@@ -162,7 +163,8 @@ export function InboundSimulatorModal({ open, onClose }: { open: boolean; onClos
               onClick={() => send(true)}
               title="Triggers H7 voice note handoff rule"
             >
-              🎤 Send as Voice Note (H7)
+              <MdOutlineMic size={14} className="inline -mt-0.5 mr-1" />
+              Send as Voice Note (H7)
             </button>
             <div className="flex items-center gap-2">
               <button type="button" className="btn-ghost" onClick={onClose}>

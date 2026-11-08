@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { MdClose, MdOutlineWarningAmber } from "react-icons/md";
 import { useStore } from "@/lib/store";
 import { chairName, clash, doctorName } from "@/lib/selectors";
 import { addDays, dayKey, fmtDay, fmtTime, fmtTime12, ist, rupees, todayKey } from "@/lib/format";
@@ -436,7 +437,7 @@ export default function TodayPage() {
                         {docAppts.length} booked · {docDone} seen
                       </span>
                       {d.visiting ? (
-                        <span className="text-[10.5px] font-semibold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600">
+                        <span className="text-[10.5px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600">
                           Visiting
                         </span>
                       ) : (
@@ -589,7 +590,7 @@ function EndVisitModal({ appt, onClose }: { appt: Appointment; onClose: () => vo
             onClick={onClose}
             className="w-7 h-7 rounded-lg border border-[#E6E7EA] text-[#667085] hover:text-[#111315] inline-flex items-center justify-center cursor-pointer"
           >
-            ✕
+            <MdClose size={15} />
           </button>
         </div>
 
@@ -714,7 +715,7 @@ function NewBookingModal({
             onClick={onClose}
             className="w-7 h-7 rounded-lg border border-[#E6E7EA] text-[#667085] hover:text-[#111315] inline-flex items-center justify-center cursor-pointer"
           >
-            ✕
+            <MdClose size={15} />
           </button>
         </div>
 
@@ -816,10 +817,13 @@ function NewBookingModal({
           </div>
 
           {conflict && (
-            <div className="bg-[#FEF3F2] border border-[#FECDCA] text-[#B42318] rounded-xl px-3.5 py-2.5 text-[12.5px] font-medium">
-              ⚠ Schedule Conflict: {doctorName(state!, conflict.doctorId)} or{" "}
-              {chairName(state!, conflict.chairId)} already has a {conflict.treatment} visit at{" "}
-              {fmtTime12(conflict.start)}.
+            <div className="bg-[#FEF3F2] border border-[#FECDCA] text-[#B42318] rounded-xl px-3.5 py-2.5 text-[12.5px] font-medium flex items-start gap-1.5">
+              <MdOutlineWarningAmber size={15} className="mt-[1px] shrink-0" />
+              <span>
+                Schedule Conflict: {doctorName(state!, conflict.doctorId)} or{" "}
+                {chairName(state!, conflict.chairId)} already has a {conflict.treatment} visit at{" "}
+                {fmtTime12(conflict.start)}.
+              </span>
             </div>
           )}
 
