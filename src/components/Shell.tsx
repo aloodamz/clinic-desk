@@ -505,12 +505,9 @@ export function Shell({ children }: { children: ReactNode }) {
                         Close
                       </button>
                     </div>
-                    <div className="flex flex-col gap-2 max-h-72 overflow-y-auto">
+                    <div className="flex flex-col divide-y divide-[#F0F1F3] max-h-72 overflow-y-auto">
                       {state.activity.slice(0, 8).map((ev) => (
-                        <div
-                          key={ev.id}
-                          className="text-xs p-2 rounded-lg bg-[#F8F8F6] border border-[#F0F1F3]"
-                        >
+                        <div key={ev.id} className="text-xs py-2 first:pt-0 last:pb-0">
                           <div className="text-[#111315] font-medium">{ev.text}</div>
                           <div className="text-[10.5px] text-[#868C98] mt-0.5">{ago(ev.at)}</div>
                         </div>

@@ -231,22 +231,22 @@ export default function ApprovalsPage() {
           <p className="text-[13px] text-[#525866] leading-relaxed">
             Every waiver keeps the original treatment charge visible on the bill:
           </p>
-          <div className="flex flex-col gap-2.5 text-[12.5px] text-[#111315]">
-            <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA]">
+          <div className="flex flex-col divide-y divide-[#F0F1F3] text-[12.5px] text-[#111315]">
+            <div className="py-2.5 first:pt-0 last:pb-0">
               <div className="font-bold">1. Never call a waiver &ldquo;Free&rdquo;</div>
               <div className="text-[#667085] mt-0.5">
                 The bill records the full charge and a separate line reading:{" "}
                 <em>&ldquo;Fee waived ₹X, approved by Dr Y&rdquo;</em>.
               </div>
             </div>
-            <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA]">
+            <div className="py-2.5 first:pt-0 last:pb-0">
               <div className="font-bold">2. Named doctor or owner decides</div>
               <div className="text-[#667085] mt-0.5">
                 Front desk and counsellors can request a waiver, but only the named doctor or the
                 owner can approve it.
               </div>
             </div>
-            <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA]">
+            <div className="py-2.5 first:pt-0 last:pb-0">
               <div className="font-bold">3. H5 price &amp; discount handoff</div>
               <div className="text-[#667085] mt-0.5">
                 When a patient asks for a discount on WhatsApp, Rule H5 stops the AI and passes the

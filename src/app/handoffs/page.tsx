@@ -174,8 +174,8 @@ export default function HandoffsPage() {
                     </Link>
                   </div>
 
-                  {/* Trigger Quote Box */}
-                  <div className="bg-[#F8F8F6] border border-[#E6E7EA] rounded-xl p-3 text-[13px] text-[#111315]">
+                  {/* Trigger Quote */}
+                  <div className="border-l-2 border-[#E6E7EA] pl-3 text-[13px] text-[#111315]">
                     <div className="text-[11px] font-bold uppercase tracking-wider text-[#868C98] mb-1">
                       Patient Trigger Excerpt
                     </div>

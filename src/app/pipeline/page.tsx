@@ -185,7 +185,7 @@ export default function PipelinePage() {
                       <span className="chip sm no-dot shrink-0">{d.source}</span>
                     </div>
 
-                    <div className="bg-[#F8F8F6] border border-[#F0F1F3] rounded-lg px-2.5 py-1.5 flex items-center justify-between text-[12px]">
+                    <div className="flex items-center justify-between text-[12px] border-t border-[#F0F1F3] pt-2">
                       <span className="font-medium text-[#111315] truncate">{d.treatment}</span>
                       {d.value ? (
                         <span className="font-bold text-[#067647] tabular-nums shrink-0 ml-2">

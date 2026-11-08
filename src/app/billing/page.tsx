@@ -343,14 +343,14 @@ export default function BillingPage() {
 
             {/* Receipts & Refunds */}
             {sel.payments.length > 0 && (
-              <div className="pt-3 border-t border-[#E6E7EA] flex flex-col gap-2">
-                <div className="text-[11px] font-bold uppercase tracking-[0.07em] text-[#868C98]">
+              <div className="pt-3 border-t border-[#E6E7EA] flex flex-col">
+                <div className="text-[11px] font-bold uppercase tracking-[0.07em] text-[#868C98] mb-1.5">
                   RECEIPTS &amp; PAYMENTS
                 </div>
                 {sel.payments.map((py) => (
                   <div
                     key={py.id}
-                    className="flex items-center justify-between text-[12.5px] bg-[#F8F8F6] border border-[#E6E7EA] rounded-lg px-3 py-2"
+                    className="flex items-center justify-between text-[12.5px] py-2 border-b border-[#F0F1F3] last:border-b-0"
                   >
                     <div>
                       <span className="font-bold text-[#111315]">{py.receiptNo}</span>
