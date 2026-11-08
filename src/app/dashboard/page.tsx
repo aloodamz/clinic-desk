@@ -404,8 +404,8 @@ export default function DashboardPage() {
               <span className="chip sm no-dot">Today</span>
             </div>
 
-            <div className="flex flex-col gap-2.5">
-              <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA] flex items-start gap-3">
+            <div className="flex flex-col divide-y divide-[#F0F1F3]">
+              <div className="py-3 first:pt-0 last:pb-0 flex items-start gap-3">
                 <span className="text-[#B54708] inline-flex items-center justify-center shrink-0 mt-0.5">
                   <MdOutlineLightbulb size={17} />
                 </span>
@@ -420,7 +420,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA] flex items-start gap-3">
+              <div className="py-3 first:pt-0 last:pb-0 flex items-start gap-3">
                 <span className="text-[#067647] inline-flex items-center justify-center shrink-0 mt-0.5">
                   <MdOutlineShield size={17} />
                 </span>
@@ -436,7 +436,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA] flex items-start gap-3">
+              <div className="py-3 first:pt-0 last:pb-0 flex items-start gap-3">
                 <span className="text-[#175CD3] inline-flex items-center justify-center shrink-0 mt-0.5">
                   <MdOutlineChatBubbleOutline size={17} />
                 </span>

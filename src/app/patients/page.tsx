@@ -220,8 +220,8 @@ function PatientsContent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-[#F0F1F3]">
-                <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA]">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3.5 border-t border-[#F0F1F3] divide-y divide-[#F0F1F3] sm:divide-y-0 sm:divide-x sm:divide-[#F0F1F3]">
+                <div className="sm:pr-4">
                   <div className="text-[10.5px] font-bold uppercase tracking-wider text-[#868C98]">
                     Primary Doctor
                   </div>
@@ -229,7 +229,7 @@ function PatientsContent() {
                     {doctorName(state, sel.assignedDoctorId)}
                   </div>
                 </div>
-                <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA]">
+                <div className="pt-2.5 sm:pt-0 sm:px-4">
                   <div className="text-[10.5px] font-bold uppercase tracking-wider text-[#868C98]">
                     Clinical Notes
                   </div>
@@ -237,7 +237,7 @@ function PatientsContent() {
                     {sel.notes || "Standard dental care"}
                   </div>
                 </div>
-                <div className="p-3 rounded-xl bg-[#F8F8F6] border border-[#E6E7EA]">
+                <div className="pt-2.5 sm:pt-0 sm:pl-4">
                   <div className="text-[10.5px] font-bold uppercase tracking-wider text-[#868C98]">
                     Total Visits &amp; Plans
                   </div>

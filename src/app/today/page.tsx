@@ -630,8 +630,10 @@ function EndVisitModal({ appt, onClose }: { appt: Appointment; onClose: () => vo
           </div>
         )}
 
-        <div className="bg-[#F8F8F6] border border-[#E6E7EA] rounded-xl p-3 mb-4 text-[12px] text-[#525866] flex flex-col gap-1">
-          <div className="font-semibold text-[#111315]">Automated Post-Visit Workflow:</div>
+        <div className="pt-3 mb-4 border-t border-[#F0F1F3] text-[12px] text-[#525866] flex flex-col gap-1">
+          <div className="font-semibold text-[#111315] uppercase tracking-wide text-[10.5px]">
+            Automated Post-Visit Workflow
+          </div>
           <div>1. Marks appointment Completed</div>
           <div>2. Creates draft Invoice ({rupees(treatmentCost(appt.treatment))})</div>
           <div>3. Sends visit summary &amp; aftercare steps via WhatsApp (checked by Send Gate)</div>
